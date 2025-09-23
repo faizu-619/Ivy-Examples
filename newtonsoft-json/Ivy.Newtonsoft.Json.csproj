@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -6,18 +6,22 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <NoWarn>CS8618;CS8603;CS8602;CS8604;CS9113</NoWarn>
-    <RootNamespace>Helloworld</RootNamespace>
-    <UserSecretsId>86fa3307-a8e2-4d3e-afea-c1a1157ea90d</UserSecretsId>
+    <RootNamespace>Ivy.Newtonsoft.Json</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Assets/**/*" />
   </ItemGroup>
+
+  
+  
   <ItemGroup>
-    <PackageReference Include="Ivy" Version="1.*" />
+    <PackageReference Include="Ivy" Version="1.0.113.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
+  
+
   <ItemGroup>
-    <Folder Include="Apps" />
     <Folder Include="Connections" />
   </ItemGroup>
 

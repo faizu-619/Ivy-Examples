@@ -1,0 +1,8 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs
+/crm-vc/.vs
+/newtonsoft-json/.ivy
+/newtonsoft-json/.vs
