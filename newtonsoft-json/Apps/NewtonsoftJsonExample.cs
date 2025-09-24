@@ -106,16 +106,6 @@ public class NewtonsoftJsonExample : ViewBase
             );
     }
 
-    private LayoutView GetCardExample()
-    {
-        return Layout.Vertical()
-            | new Badge("Primary")
-            | new Badge("New")
-            | new Button("Primary Button")
-            | new Progress(75)
-            | new Card("Card Content");
-    }
-
     private void RunJsonPath()
     {
         var token = JToken.Parse(_inputJson);
