@@ -40,23 +40,9 @@ public class NewtonsoftJsonExample : ViewBase
             .Title("Newtonsoft Json Example")
             .Description("Newtonsoft Json.NET Version: " + attribute.Version)
             | Layout.Vertical(
-                //cardExample,
                 Layout.Horizontal(
                     new Card(
                         Layout.Vertical(
-                            //new Button("Click To Serialize This Card", _ =>
-                            //{
-                            //    jsonCode.Set(Json(cardExample.));
-                            //    _jsonPath = string.Empty;
-                                
-                            //    RunJsonPath();
-                            //    DeserializeToTypes();
-                            //    StreamRead();
-
-                            //    htmlResultTyped.Set(Text.Html(_typedResult));
-                            //    htmlResultLinq.Set(Text.Html(_linqResult));
-                            //    htmlResultStream.Set(Text.Html(_streamResult));
-                            //}),
                             jsonCode.ToCodeInput()
                                 .Width(Size.Auto())
                                 .Height(Size.Auto())
@@ -66,7 +52,8 @@ public class NewtonsoftJsonExample : ViewBase
                                 .Width(Size.Auto())
                                 .Height(Size.Auto())
                                 .Language(Languages.Json),
-                            new Button("Run", _ =>
+                            Layout.Horizontal(
+                                new Button("Run", _ =>
                                 {
                                     _inputJson = jsonCode.Value;
                                     _jsonPath = jsonPath.Value;
@@ -78,8 +65,25 @@ public class NewtonsoftJsonExample : ViewBase
                                     htmlResultLinq.Set(Text.Html(_linqResult));
                                     htmlResultStream.Set(Text.Html(_streamResult));
                                 })
-                                .Icon(Icons.ArrowRightLeft)
-                                .Variant(ButtonVariant.Outline)
+                                .Icon(Icons.Play)
+                                .Variant(ButtonVariant.Outline),
+                            new Button("Reset", _ =>
+                            {
+                                _inputJson = SampleJson.Pretty;
+                                _jsonPath = "$.store.book[?(@.price < 10)].title";
+
+                                RunJsonPath();
+                                DeserializeToTypes();
+                                StreamRead();
+
+                                htmlResultTyped.Set(Text.Html(""));
+                                htmlResultLinq.Set(Text.Html(""));
+                                htmlResultStream.Set(Text.Html(""));
+                            })
+                                    .Icon(Icons.Reply)
+                                    .Variant(ButtonVariant.Outline)
+
+                                    )
                         )
                     )
                     .Title("Input JSON")
@@ -104,16 +108,12 @@ public class NewtonsoftJsonExample : ViewBase
 
     private LayoutView GetCardExample()
     {
-        return Layout.Vertical() 
+        return Layout.Vertical()
             | new Badge("Primary")
             | new Badge("New")
             | new Button("Primary Button")
             | new Progress(75)
             | new Card("Card Content");
-        //return new Card()
-        //    .Title("Card Example")
-        //    .Description("This is a card description")
-        //    | Text.P("This is some text inside the card");
     }
 
     private void RunJsonPath()
