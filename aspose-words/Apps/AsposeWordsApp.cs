@@ -11,138 +11,68 @@ public class AsposeWordsApp : ViewBase
 
     public override object? Build()
     {
-        var selectedTemplate = UseState<DocumentTemplate?>();
-        var documentContent = UseState<string>("");
-        var isGenerating = UseState(false);
-        
         var templates = new[]
         {
             new DocumentTemplate(
-                "Simple Letter", 
+                "Simple Letter",
                 "A basic business letter template",
                 () => GenerateSimpleLetter()
             ),
             new DocumentTemplate(
-                "Table Report", 
+                "Table Report",
                 "Document with formatted tables and data",
                 () => GenerateTableReport()
             ),
             new DocumentTemplate(
-                "Invoice", 
+                "Invoice",
                 "Professional invoice template",
                 () => GenerateInvoice()
             ),
             new DocumentTemplate(
-                "Form Letter", 
+                "Form Letter",
                 "Mail merge style form letter",
                 () => GenerateFormLetter()
             )
         };
 
-        // Create download functionality
-        var downloadUrl = this.UseDownload(
-            () =>
-            {
-                if (selectedTemplate.Value == null) return Array.Empty<byte>();
-                
-                var doc = selectedTemplate.Value.Generator();
-                using var stream = new MemoryStream();
-                doc.Save(stream, SaveFormat.Docx);
-                return stream.ToArray();
-            },
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            $"document-{DateTime.Now:yyyy-MM-dd-HHmmss}.docx"
-        );
-
         return Layout.Vertical().Gap(4)
             | Text.H2("Aspose.Words for .NET Demo")
             | Text.Block("Create, modify, and export Word documents programmatically using Aspose.Words.")
             
-            | new Card().Title("Document Templates").Description("Choose a template to generate")
+            | new Card().Title("Document Templates").Description("Click download to generate and download documents")
             | Layout.Grid().Columns(2).Gap(3)
             | templates.Select(template =>
-                new Card(
-                    Layout.Vertical().Gap(2)
-                    | Text.H4(template.Name)
-                    | Text.Muted(template.Description)
-                    | new Button("Generate", _ => {
-                        selectedTemplate.Set(template);
-                        isGenerating.Set(true);
-                        
-                        // Generate preview content
+            {
+                // Create download functionality for each template
+                var downloadUrl = this.UseDownload(
+                    () =>
+                    {
                         try
                         {
                             var doc = template.Generator();
-                            var textContent = doc.GetText();
-                            var preview = textContent.Length > 500
-                                ? textContent.Substring(0, 500) + "..."
-                                : textContent;
-                            documentContent.Set(preview);
+                            using var stream = new MemoryStream();
+                            doc.Save(stream, SaveFormat.Docx);
+                            return stream.ToArray();
                         }
-                        catch (Exception ex)
+                        catch
                         {
-                            documentContent.Set($"Error generating preview: {ex.Message}");
+                            return Array.Empty<byte>();
                         }
-                        finally
-                        {
-                            isGenerating.Set(false);
-                        }
-                    }).Primary()
-                    | (selectedTemplate.Value?.Name == template.Name ? Icons.Check : null)
-                )
-            )
+                    },
+                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    $"{template.Name.Replace(" ", "-").ToLower()}-{DateTime.Now:yyyy-MM-dd-HHmmss}.docx"
+                );
 
-            | (selectedTemplate.Value != null ?
-                new Card().Title($"Generated: {selectedTemplate.Value.Name}").Description("Document preview and download")
-                | Layout.Vertical().Gap(3)
-                | (isGenerating.Value ?
-                    Layout.Horizontal().Align(Align.Center).Gap(2)
-                    | Text.Muted("Generating document...")
-                    :
+                return new Card(
                     Layout.Vertical().Gap(2)
-                    | Text.H4("Document Preview:")
-                    | Text.Block(documentContent.Value)
-                    | Layout.Horizontal().Gap(2)
+                    | Text.H4(template.Name)
+                    | Text.Muted(template.Description)
                     | new Button("Download DOCX")
                         .Primary()
                         .Icon(Icons.Download)
                         .Url(downloadUrl.Value)
-                    | new Button("Generate New", _ => {
-                        selectedTemplate.Set(selectedTemplate.Value);
-                        isGenerating.Set(true);
-                        
-                        try
-                        {
-                            var doc = selectedTemplate.Value!.Generator();
-                            var textContent = doc.GetText();
-                            var preview = textContent.Length > 500
-                                ? textContent.Substring(0, 500) + "..."
-                                : textContent;
-                            documentContent.Set(preview);
-                        }
-                        catch (Exception ex)
-                        {
-                            documentContent.Set($"Error: {ex.Message}");
-                        }
-                        finally
-                        {
-                            isGenerating.Set(false);
-                        }
-                    })
-                        .Secondary()
-                        .Icon(Icons.RefreshCw)
-                )
-                : null
-            )
-
-            | new Card().Title("Features Demonstrated")
-            | Layout.Vertical().Gap(1)
-            | Text.Block("• Document creation and formatting")
-            | Text.Block("• Table creation and styling")
-            | Text.Block("• Text formatting and styling")
-            | Text.Block("• Headers and footers")
-            | Text.Block("• Document export to DOCX format")
-            | Text.Block("• Mail merge capabilities");
+                );
+            });
     }
 
     private static Document GenerateSimpleLetter()
@@ -305,10 +235,7 @@ public class AsposeWordsApp : ViewBase
         builder.Font.Color = System.Drawing.Color.Black;
         builder.Writeln();
 
-        // Company info and invoice details side by side
-        var table = builder.StartTable();
-        builder.InsertCell();
-        builder.CellFormat.Width = 250;
+        // Company info
         builder.Font.Bold = true;
         builder.Writeln("ACME Services Ltd.");
         builder.Font.Bold = false;
@@ -316,9 +243,9 @@ public class AsposeWordsApp : ViewBase
         builder.Writeln("Business City, BC 12345");
         builder.Writeln("Phone: (555) 987-6543");
         builder.Writeln("Email: billing@acme-services.com");
+        builder.Writeln();
 
-        builder.InsertCell();
-        builder.CellFormat.Width = 200;
+        // Invoice details
         builder.Font.Bold = true;
         builder.Write("Invoice #: ");
         builder.Font.Bold = false;
@@ -331,8 +258,6 @@ public class AsposeWordsApp : ViewBase
         builder.Write("Due Date: ");
         builder.Font.Bold = false;
         builder.Writeln(DateTime.Now.AddDays(30).ToString("MM/dd/yyyy"));
-        builder.EndRow();
-        builder.EndTable();
 
         builder.Writeln();
         builder.Writeln();
@@ -347,18 +272,26 @@ public class AsposeWordsApp : ViewBase
         builder.Writeln();
 
         // Services table
-        table = builder.StartTable();
+        var table = builder.StartTable();
         table.PreferredWidth = PreferredWidth.FromPercent(100);
 
-        // Header
-        string[] headers = { "Description", "Quantity", "Rate", "Amount" };
-        foreach (var header in headers)
-        {
-            builder.InsertCell();
-            builder.CellFormat.Shading.BackgroundPatternColor = System.Drawing.Color.LightGray;
-            builder.Font.Bold = true;
-            builder.Write(header);
-        }
+        // Header row
+        builder.InsertCell();
+        builder.CellFormat.Shading.BackgroundPatternColor = System.Drawing.Color.LightGray;
+        builder.Font.Bold = true;
+        builder.Write("Description");
+
+        builder.InsertCell();
+        builder.CellFormat.Shading.BackgroundPatternColor = System.Drawing.Color.LightGray;
+        builder.Write("Quantity");
+
+        builder.InsertCell();
+        builder.CellFormat.Shading.BackgroundPatternColor = System.Drawing.Color.LightGray;
+        builder.Write("Rate");
+
+        builder.InsertCell();
+        builder.CellFormat.Shading.BackgroundPatternColor = System.Drawing.Color.LightGray;
+        builder.Write("Amount");
         builder.EndRow();
 
         // Line items
