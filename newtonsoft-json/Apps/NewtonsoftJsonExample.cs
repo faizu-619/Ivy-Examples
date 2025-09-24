@@ -5,8 +5,6 @@ using System;
 using System.ComponentModel;
 using System.Reactive.Linq;
 using System.Reflection;
-using System.Text.Json.Nodes;
-
 [App(icon: Icons.Box)]
 public class NewtonsoftJsonExample : ViewBase
 {
