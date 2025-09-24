@@ -70,13 +70,17 @@ public class NewtonsoftJsonExample : ViewBase
                                 _inputJson = SampleJson.Pretty;
                                 _jsonPath = "$.store.book[?(@.price < 10)].title";
 
+                                _typedResult = "";
+                                _linqResult = "";
+                                _streamResult = "";
+
                                 RunJsonPath();
                                 DeserializeToTypes();
                                 StreamRead();
 
-                                htmlResultTyped.Set(Text.Html(""));
-                                htmlResultLinq.Set(Text.Html(""));
-                                htmlResultStream.Set(Text.Html(""));
+                                htmlResultTyped.Set(Text.Html(_typedResult));
+                                htmlResultLinq.Set(Text.Html(_linqResult));
+                                htmlResultStream.Set(Text.Html(_streamResult));
                             })
                                     .Icon(Icons.Reply)
                                     .Variant(ButtonVariant.Outline)
