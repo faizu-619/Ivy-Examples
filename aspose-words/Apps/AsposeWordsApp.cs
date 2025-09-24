@@ -54,9 +54,20 @@ public class AsposeWordsApp : ViewBase
                             doc.Save(stream, SaveFormat.Docx);
                             return stream.ToArray();
                         }
-                        catch
+                        catch (Exception ex)
                         {
-                            return Array.Empty<byte>();
+                            // Create an error document instead of returning empty
+                            var errorDoc = new Document();
+                            var errorBuilder = new DocumentBuilder(errorDoc);
+                            errorBuilder.Writeln($"Error generating {template.Name}:");
+                            errorBuilder.Writeln(ex.Message);
+                            errorBuilder.Writeln();
+                            errorBuilder.Writeln("Stack Trace:");
+                            errorBuilder.Writeln(ex.StackTrace ?? "No stack trace available");
+                            
+                            using var errorStream = new MemoryStream();
+                            errorDoc.Save(errorStream, SaveFormat.Docx);
+                            return errorStream.ToArray();
                         }
                     },
                     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -273,9 +284,8 @@ public class AsposeWordsApp : ViewBase
 
         // Services table
         var table = builder.StartTable();
-        table.PreferredWidth = PreferredWidth.FromPercent(100);
 
-        // Header row
+        // Header row - must be added before setting table properties
         builder.InsertCell();
         builder.CellFormat.Shading.BackgroundPatternColor = System.Drawing.Color.LightGray;
         builder.Font.Bold = true;
@@ -293,6 +303,9 @@ public class AsposeWordsApp : ViewBase
         builder.CellFormat.Shading.BackgroundPatternColor = System.Drawing.Color.LightGray;
         builder.Write("Amount");
         builder.EndRow();
+
+        // Set table width after adding the first row
+        table.PreferredWidth = PreferredWidth.FromPercent(100);
 
         // Line items
         var items = new[]
