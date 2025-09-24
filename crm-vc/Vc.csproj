@@ -13,7 +13,7 @@
     <EmbeddedResource Include="Assets/**/*" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Ivy" Version="1.0.106.0" />
+    <PackageReference Include="Ivy" Version="1.*" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Design" Version="1.1.6" />
@@ -27,7 +27,7 @@
     <Folder Include="Connections" />
   </ItemGroup>
   <ItemGroup>
-    <None Update="D:\Repos\_Ivy\Ivy-Examples\crm-vc\db.sqlite">
+    <None Update="db.sqlite">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
