@@ -35,35 +35,48 @@ public class AsposeWordsApp : ViewBase
             )
         };
 
+        // State for each template
+        var generatedDocuments = UseState<Dictionary<string, Document>>(new Dictionary<string, Document>());
+        var isGenerating = UseState<string?>("");
+
         return Layout.Vertical().Gap(4)
             | Text.H2("Aspose.Words for .NET Demo")
-            | Text.Block("Create, modify, and export Word documents programmatically using Aspose.Words.")
+            | Text.Block("Generate and download Word documents using Aspose.Words.")
             
-            | new Card().Title("Document Templates").Description("Click download to generate and download documents")
+            | new Card().Title("Document Templates").Description("Click Generate to create documents, then Download")
             | Layout.Grid().Columns(2).Gap(3)
             | templates.Select(template =>
             {
+                var isTemplateGenerated = generatedDocuments.Value.ContainsKey(template.Name);
+                var isCurrentlyGenerating = isGenerating.Value == template.Name;
+                
                 // Create download functionality for each template
                 var downloadUrl = this.UseDownload(
                     () =>
                     {
                         try
                         {
-                            var doc = template.Generator();
+                            Document doc;
+                            if (isTemplateGenerated)
+                            {
+                                // Use the stored document
+                                doc = generatedDocuments.Value[template.Name];
+                            }
+                            else
+                            {
+                                doc = template.Generator();
+                            }
+                            
                             using var stream = new MemoryStream();
                             doc.Save(stream, SaveFormat.Docx);
                             return stream.ToArray();
                         }
                         catch (Exception ex)
                         {
-                            // Create an error document instead of returning empty
                             var errorDoc = new Document();
                             var errorBuilder = new DocumentBuilder(errorDoc);
                             errorBuilder.Writeln($"Error generating {template.Name}:");
                             errorBuilder.Writeln(ex.Message);
-                            errorBuilder.Writeln();
-                            errorBuilder.Writeln("Stack Trace:");
-                            errorBuilder.Writeln(ex.StackTrace ?? "No stack trace available");
                             
                             using var errorStream = new MemoryStream();
                             errorDoc.Save(errorStream, SaveFormat.Docx);
@@ -78,10 +91,49 @@ public class AsposeWordsApp : ViewBase
                     Layout.Vertical().Gap(2)
                     | Text.H4(template.Name)
                     | Text.Muted(template.Description)
-                    | new Button("Download DOCX")
+                    
+                    // Step 1: Generate button (if not generated)
+                    | (!isTemplateGenerated && !isCurrentlyGenerating ?
+                        new Button("Generate", _ => {
+                            isGenerating.Set(template.Name);
+                            try
+                            {
+                                var doc = template.Generator();
+                                var updatedDocs = new Dictionary<string, Document>(generatedDocuments.Value)
+                                {
+                                    [template.Name] = doc
+                                };
+                                generatedDocuments.Set(updatedDocs);
+                            }
+                            catch
+                            {
+                                // Handle error silently
+                            }
+                            finally
+                            {
+                                isGenerating.Set("");
+                            }
+                        })
                         .Primary()
-                        .Icon(Icons.Download)
-                        .Url(downloadUrl.Value)
+                        .Icon(Icons.Play)
+                        : null
+                    )
+                    
+                    // Loading state
+                    | (isCurrentlyGenerating ?
+                        Layout.Horizontal().Align(Align.Center).Gap(2)
+                        | Text.Muted("Generating...")
+                        : null
+                    )
+                    
+                    // Step 2: Download button (if generated)
+                    | (isTemplateGenerated && !isCurrentlyGenerating ?
+                        new Button("Download DOCX")
+                            .Primary()
+                            .Icon(Icons.Download)
+                            .Url(downloadUrl.Value)
+                        : null
+                    )
                 );
             });
     }
