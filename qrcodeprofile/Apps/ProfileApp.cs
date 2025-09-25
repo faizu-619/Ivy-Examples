@@ -49,17 +49,17 @@ public class ProfileApp : ViewBase
         {
             if (await onSubmit())
             {
-                    // Generate vCard QR code for contact sharing
-                    qrCodeBase64.Value = qrCodeService.GenerateVCardQrCodeAsBase64(
-                        profile.Value.FirstName,
-                        profile.Value.LastName,
-                        profile.Value.Email,
-                        profile.Value.Phone,
-                        profile.Value.LinkedIn,
-                        profile.Value.GitHub,
-                        8
-                    );
-                    profileSubmitted.Value = true;
+                // Generate vCard QR code for contact sharing
+                qrCodeBase64.Value = qrCodeService.GenerateVCardQrCodeAsBase64(
+                    profile.Value.FirstName,
+                    profile.Value.LastName,
+                    profile.Value.Email,
+                    profile.Value.Phone,
+                    profile.Value.LinkedIn,
+                    profile.Value.GitHub,
+                    8
+                );
+                profileSubmitted.Value = true;
             }
         }
 
@@ -86,13 +86,6 @@ public class ProfileApp : ViewBase
                 | new DemoBox(
                     Text.Html($"<img src=\"data:image/png;base64,{qrCodeBase64.Value}\" />")
             ).BorderStyle(BorderStyle.None).Width(Size.Units(70)).Height(Size.Units(70)))
-                | (Layout.Horizontal().Align(Align.Center)
-                    | new Button("Generate New QR Code").HandleClick(new Action(() =>
-                    {
-                        qrCodeBase64.Value = "";
-                        profileSubmitted.Value = false;
-                    })))
-
             ).Height(Size.Full())
             : new Card(
                 Layout.Vertical().Gap(6).Padding(2)
@@ -104,8 +97,8 @@ public class ProfileApp : ViewBase
 
         return Layout.Vertical().Height(Size.Full())
             | new ResizeablePanelGroup(
-                new ResizeablePanel(70, formContent), 
-                new ResizeablePanel(30, qrCodeContent)    
+                new ResizeablePanel(70, formContent),
+                new ResizeablePanel(30, qrCodeContent)
             ).Horizontal();
 
     }

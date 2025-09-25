@@ -55,22 +55,6 @@ public class QrCodeService : IQrCodeService
             vCard.AppendLine($"URL;TYPE=GitHub:{github}");
         }
         
-        // Add note with social profiles if they exist
-        var notes = new List<string>();
-        if (!string.IsNullOrWhiteSpace(linkedin))
-        {
-            notes.Add($"LinkedIn: {linkedin}");
-        }
-        if (!string.IsNullOrWhiteSpace(github))
-        {
-            notes.Add($"GitHub: {github}");
-        }
-        
-        if (notes.Count > 0)
-        {
-            vCard.AppendLine($"NOTE:{string.Join(" | ", notes)}");
-        }
-        
         // vCard footer
         vCard.AppendLine("END:VCARD");
         
