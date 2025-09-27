@@ -21,8 +21,6 @@ public class NewtonsoftJsonExample : ViewBase
     public override object? Build()
     {
         var attribute = typeof(JsonConvert).GetTypeInfo().Assembly.GetCustomAttribute<AssemblyFileVersionAttribute>();
-        var cardExample = GetCardExample();
-
         var htmlResultTyped = UseState(Text.Html(_typedResult));
         var htmlResultLinq = UseState(Text.Html(_linqResult));
         var htmlResultStream = UseState(Text.Html(_streamResult));
