@@ -1,11 +1,7 @@
-using Ivy;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
-using System;
-using System.ComponentModel;
-using System.Reactive.Linq;
 using System.Reflection;
-[App(icon: Icons.Box)]
+[App(icon: Icons.File)]
 public class NewtonsoftJsonExample : ViewBase
 {
     private string _inputJson = SampleJson.Pretty;
